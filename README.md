@@ -1,28 +1,49 @@
-# 03 MRV 2023：同型集装箱船的碳强度差异与船龄解释力
+# 2023 年挂靠欧盟港口的集装箱船中，同型船内部的碳强度差异有多大？EEXI 设计能效能解释其中多少比例？
 
-一句话：用 2023 年 THETIS-MRV 单年截面，比较四个 TEU 档内部的碳强度差异，
-并估计船龄能解释其中多少比例的变异（与“只用 TEU 档均值”的基线对比）。
+## 研究问题
+1. EEXI设计能效能解释多少比例的集装箱船运营碳强度差异？
+2. 不同规模（按总CO₂排放量分组）的集装箱船中，EEXI的解释力是否存在差异？
 
-## 1 怎样运行
-- 环境：Python 3.12（Miniforge 的 shipping 环境）+ pandas / numpy / matplotlib / openpyxl
-- 把 2023 年导出放进 data/raw/（不改名、不编辑），然后：python analysis/run_all.py
-- 全部产物：data/clean/、figures/、tables/；删掉它们也能由脚本重建。
+## 数据来源
+- 数据平台：EMSA THETIS-MRV（欧盟船舶碳排放监测、报告与核查数据库）
+- 下载地址：https://www.emsa.europa.eu/
+- 数据年份：2023年
+- 原始文件：`data/raw/thrtis_mrv_2023.xlsx`
+- 筛选后样本：1480艘有EEXI认证的集装箱船
 
-## 2 数据从哪里来
-| 文件 | 来源 | 报告期 | 下载日期 | 大小 | SHA256 前 12 位 |
-| mrv_2023.xlsx | THETIS-MRV 公开报告 | 2023 | [日期] | [大小] | [前 12 位] |
-筛选后 n = [ ]；四个 TEU 档：[ ]/[ ]/[ ]/[ ]；船龄覆盖率 [ ]%（来源：Equasis 人工检索）
+## 项目结构
+MRV_dazuoye/
+├── data/
+│   ├── raw/                # 原始数据（不进 git）
+│   │   └── thrtis_mrv_2023.xlsx
+│   └── clean/              # 清洗后数据
+│       └── container_clean.csv
+├── analysis/               # 分析代码
+│   ├── 01_clean.py         # 数据清洗脚本
+│   ├── 02_explore.py       # 探索性分析与可视化
+│   └── 03_model.py         # 回归模型与 R² 分解
+├── figures/                # 输出图表
+├── tables/                 # 输出表格
+├── narrative/              # 报告与文档
+│   ├── report.md           # 课程报告正文
+│   └── data_log        # 数据清洗日志
+└── README.md
 
-## 3 口径
-碳强度 I2 = CO2(t) x 1e6 / (DWT x 距离)，单位 g CO2/(t·nm)；船龄 = 2023 - 建造年；
-同型 = 同一报告年 + 集装箱船 + 同一 TEU 档。
+## 环境配置
+- Python 3.12
+- 虚拟环境：conda activate shipping
+- 依赖包：pandas, openpyxl, scikit-learn, matplotlib
 
-## 4 预期结果
-fig1–fig6 与 tables/desc_2023.csv、model_2023.csv；关键数字：
-R2_base = [ ]；R2_full = [ ]；dR2 = [ ]；船龄系数 = [ ]（95% 区间 [ ] ~ [ ]）。
-落在三种情形中的第 [A/B/C] 类，理由见报告 4.5。
+## 复现步骤
+```bash
+# 1. 激活环境
+conda activate shipping
 
-## 5 已知问题
-- TEU 缺失时用 GT 代理分组（局限第 6 条）；
-- 未控制载货率与航线明细（公开版无此字段）；
-- 船龄为人工检索，覆盖率 [ ]%，按整年计，误差 ±1 年。
+# 2. 运行数据清洗
+python analysis/01_clean.py
+
+# 3. 运行探索性分析
+python analysis/02_explore.py
+
+# 4. 运行回归模型
+python analysis/03_model.py
