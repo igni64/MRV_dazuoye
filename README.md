@@ -1,49 +1,38 @@
-# 2023 年挂靠欧盟港口的集装箱船中，同型船内部的碳强度差异有多大？EEXI 设计能效能解释其中多少比例？
+# 基于2023年欧盟MRV三种船型的EEXI设计能效对船舶碳强度差异的解释力分析
 
-## 研究问题
-1. EEXI设计能效能解释多少比例的集装箱船运营碳强度差异？
-2. 不同规模（按总CO₂排放量分组）的集装箱船中，EEXI的解释力是否存在差异？
+## 一句话
+EEXI设计能效能解释多少船舶实际碳强度差异？不同船型是否一样？
 
-## 数据来源
-- 数据平台：EMSA THETIS-MRV（欧盟船舶碳排放监测、报告与核查数据库）
-- 下载地址：https://www.emsa.europa.eu/
-- 数据年份：2023年
-- 原始文件：`data/raw/thrtis_mrv_2023.xlsx`
-- 筛选后样本：1480艘有EEXI认证的集装箱船
+## 怎样运行
+1. 环境：按课程网站《环境配置》页面安装本地开发环境（Python 3.12、pandas、matplotlib、statsmodels）
+2. 把原始数据放进 `data/raw/`（文件清单见下）
+3. 依次运行：
+   - `python analysis/01_clean.py`    → 生成 `data/clean/ships_clean.csv`，共4105艘
+   - `python analysis/02_explore.py`  → 生成 至 
+   - `python analysis/03_model.py`    → 打印M0-M4模型阶梯结果、分船型回归表、7项稳健性检验
 
-## 项目结构
-MRV_dazuoye/
-├── data/
-│   ├── raw/                # 原始数据（不进 git）
-│   │   └── thrtis_mrv_2023.xlsx
-│   └── clean/              # 清洗后数据
-│       └── container_clean.csv
-├── analysis/               # 分析代码
-│   ├── 01_clean.py         # 数据清洗脚本
-│   ├── 02_explore.py       # 探索性分析与可视化
-│   └── 03_model.py         # 回归模型与 R² 分解
-├── figures/                # 输出图表
-├── tables/                 # 输出表格
-├── narrative/              # 报告与文档
-│   ├── report.md           # 课程报告正文
-│   └── data_log        # 数据清洗日志
-└── README.md
+## 数据从哪里来
+| 文件 | 来源 | 性质 | 下载日期 |
+|---|---|---|---|
+| thrtis_mrv_2023.xlsx | EMSA THETIS-MRV官网（欧洲海事安全局） | 〔官〕 | 2026.10.25 |
 
-## 环境配置
-- Python 3.12
-- 虚拟环境：conda activate shipping
-- 依赖包：pandas, openpyxl, scikit-learn, matplotlib
+## 预期的结果
+运行01_clean.py后终端应打印：
+```
+已保存：data\clean\ships_clean.csv
+文件行数：4105，文件大小：358.63 KB
+三个变量的均值、标准差、最小值、最大值：
+```
+运行03_model.py后终端应打印：
+```
+M3完整模型 R² = 0.4595
+EEXI系数 = 2.5256，p ≈ 0
+集装箱船 R² = 0.6233，散货船 R² = 0.0364，油船 R² = 0.4553
+```
 
-## 复现步骤
-```bash
-# 1. 激活环境
-conda activate shipping
-
-# 2. 运行数据清洗
-python analysis/01_clean.py
-
-# 3. 运行探索性分析
-python analysis/02_explore.py
-
-# 4. 运行回归模型
-python analysis/03_model.py
+## 已知的问题
+1. 仅2023年单年横截面数据，无法分析EEXI与碳强度关系的年度变化趋势
+2. 无航速、航线、载货率等运营变量，只能做相关性分析，不能做因果推断
+3. 仅覆盖挂靠欧盟港口的船舶，样本不能代表全球船队
+4. 用年度总CO₂代理船舶规模，无真实DWT/GT吨位数据，规模控制精度有限
+5. 2023年是EEXI/CII强制实施首年，后疫情供应链调整可能扰动当年观测值
