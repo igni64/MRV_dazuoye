@@ -1,12 +1,33 @@
-data/raw/*
-!data/raw/.gitkeep
-data/clean/*
-!data/clean/.gitkeep
+# ---------- Python ----------
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
+
+# ---------- 操作系统 ----------
 .DS_Store
 Thumbs.db
-*.xlsx
-*.csv
+
+# ---------- 清洗后样本：可由 01_clean.py 重建 ----------
+data/clean/*
+!data/clean/.gitkeep
+
+# ---------- 原始数据：提交，保证 clone 后可直接复现 ----------
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/thrtis_mrv_2023.xlsx
+!data/raw/unlocode/
+!data/raw/unlocode/unlocode_latest.zip
+data/explore/*
+!data/explore/registry_map_ready.csv
+!data/explore/ne_110m_land.geojson
+!data/explore/validation.json
+
+# ---------- 图3 运行时统计表：每次运行会覆盖 ----------
+figures/*.csv
+
+# ---------- 导出的 PDF：图已用 PNG，其余 PDF 不进仓库 ----------
 *.pdf
+
+# ---------- 阶段提交物：保留 PDF，忽略截图 ----------
+!submissions/*.pdf
+submissions/*.png

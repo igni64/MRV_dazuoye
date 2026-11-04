@@ -1,0 +1,10 @@
+{
+  "ship_count": 4105,
+  "registry_missing": 88,
+  "coordinate_covered_ships": 3664,
+  "pending_nonmissing_ships": 353,
+  "ready_groups": 30,
+  "ready_ships": 3467,
+  "min_group_n": 20,
+  "source_zip_sha256": "ecf6fcc57abcf5e567cb8d42f0de8dd621371b25b33fa5a730c16c4771cbfabb"
+}
