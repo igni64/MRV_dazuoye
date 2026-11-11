@@ -61,7 +61,7 @@ MRV_dazuoye/
 │       └── ne_110m_land.geojson      图3 底图
 ├── figures/                          fig01–fig04（PNG + PDF）
 ├── tables/                           model_results.csv、shapley_decomposition.csv
-└── narrative/                        report.md、data_log.md、3_figures_report.docx
+└── narrative/                        report.md、data_log.md、ai_disclosure.md
 ```
 
 ## 预期的结果

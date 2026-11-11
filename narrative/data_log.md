@@ -1,12 +1,14 @@
 # 数据处理日志
-# 原始数据
+
+## 原始数据
 来源：EMSA THETIS-MRV
 文件：thrtis_mrv_2023
 下载时间：2026.10.25
 原始行数：12829 行
 
-# 清洗步骤
-步骤 1：筛选三种目标船型
+## 清洗步骤
+
+### 步骤 1：筛选三种目标船型
 操作：只保留 Ship type 属于 Container ship、Bulk carrier、Oil tanker
 删除前：12829 行
 删除：5176 行
@@ -17,7 +19,7 @@ Container ship: 1928 行
 Bulk carrier: 3796 行
 Oil tanker: 1929 行
 
-步骤 2：筛选有 EEXI 认证的船舶
+### 步骤 2：筛选有 EEXI 认证的船舶
 操作：保留 Technical efficiency 包含 "EEXI" 的记录，排除 EEDI/EIV/Not
 删除前：7653 行
 删除：3397 行
@@ -28,7 +30,7 @@ Container ship: 1482 行
 Bulk carrier: 1785 行
 Oil tanker: 989 行
 
-步骤 3：提取碳强度并筛选非空 / 正值
+### 步骤 3：提取碳强度并筛选非空 / 正值
 操作：提取 co2_intensity 列为数值型，删除空值和≤0 的记录
 co2_intensity 非空 4107 条，空值 149 条
 co2_intensity ≤ 0 的条数：1
@@ -37,7 +39,7 @@ co2_intensity ≤ 0 的条数：1
 删除后：4106 行
 理由：碳强度是因变量 Y，缺失或非正值无法用于回归
 
-步骤 4：提取总 CO2 并筛选非空 / 正值
+### 步骤 4：提取总 CO2 并筛选非空 / 正值
 操作：提取 total_co2 列为数值型，删除空值和≤0 的记录
 total_co2 非空 4106 条，空值 0 条
 total_co2 ≤ 0 的条数：0
@@ -46,7 +48,7 @@ total_co2 ≤ 0 的条数：0
 删除后：4106 行
 理由：total_co2 是规模控制变量，缺失或非正值无法用于分组和回归
 
-步骤 5：正则提取 EEXI 数值并剔除异常值
+### 步骤 5：正则提取 EEXI 数值并剔除异常值
 操作：从 Technical efficiency 列用正则提取 EEXI 括号内数值，删除≤0 的异常记录
 eexi_value 解析成功 4106 条，失败 0 条
 eexi_value ≤ 0.0 的条数：1
@@ -54,9 +56,9 @@ eexi_value ≤ 0.0 的条数：1
 删除前：4106 行
 删除：1 行
 删除后：4105 行
-理由：EEXI 为 0 的记录明显是数据错误，物理上不存在设计能效为 0 的船舶 
+理由：EEXI 为 0 的记录明显是数据错误，物理上不存在设计能效为 0 的船舶
 
-步骤 6：按船型做 1%/99% 缩尾
+### 步骤 6：按船型做 1%/99% 缩尾
 操作：每种船型内部分别进行 1% 和 99% 分位缩尾，生成 co2_intensity_winsor 列
 各船型缩尾阈值：
 散货船：1% 分位 2.939，99% 分位 140.850，裁剪 34 条，最大值从 3802056.66 压缩到 140.850
@@ -68,7 +70,7 @@ eexi_value ≤ 0.0 的条数：1
 理由：原始数据存在数量级异常值（散货船最大值达 380 万，明显录入错误），不处理会完全掩盖
 真实回归关系。缩尾比直接删除更温和，保留全部样本量
 
-步骤 7：按 total_co2 全样本三分位生成 size_group
+### 步骤 7：按 total_co2 全样本三分位生成 size_group
 操作：全部 4105 艘船按 total_co2 从小到大等频切分为三组
 各分组数量：
 Small: 1368 艘
@@ -80,7 +82,7 @@ Medium: 3950.76 ~ 10215.56
 Large: 10219.51 ~ 92144.21
 删除前：4105 行，删除 0 行（仅新增分组列），删除后：4105 行
 
-步骤 8：按船型内 total_co2 三分位生成 size_group_within_type
+### 步骤 8：按船型内 total_co2 三分位生成 size_group_within_type
 操作：每种船型内部各自按 total_co2 从小到大等频切分为三组
 船型 × 分组交叉表：
 集装箱船：Small 493 艘 / Medium 493 艘 / Large 494 艘
@@ -89,7 +91,7 @@ Large: 10219.51 ~ 92144.21
 删除前：4105 行，删除 0 行（仅新增分组列），删除后：4105 行
 理由：全样本三分位存在船型与规模混淆问题（Small 组 70% 是散货船，Large 组 72% 是集装箱船），船型内三分位可实现同类型船舶内部的大小对比
 
-# 最终样本
+## 最终样本
 文件行数：4105，文件大小：358.63 KB
 最终样本量：4105
 输出列：imo, ship_name, ship_type, ship_type_group, report_year, co2_intensity, co2_intensity_winsor, total_co2, eexi_value, size_group, size_group_within_type
@@ -115,9 +117,12 @@ eexi_value：均值 7.88，标准差 6.22，最小值 1.65，最大值 35.14
 油船 Medium：碳强度 13.95，EEXI 4.33，总 CO₂ 7450.51
 油船 Large：碳强度 9.86，EEXI 3.41，总 CO₂ 15488.81
 
-# 辅助数据构建（非建模用） 目的：
-为图3 提供注册地坐标与分组汇总 输入：`ships_clean.csv` 的 `Port of Registry` + UN/LOCODE（`data/raw/unlocode/`） 
-处理：港口名标准化 → 匹配坐标 → 剔除无坐标/不足 20 艘的组 输出：`data/explore/registry_map_ready.csv`（30 组 / 3,467 艘） 
+## 辅助数据构建（非建模用）
+目的：为图3 提供注册地坐标与分组汇总
+输入：`ships_clean.csv` 的 IMO + `data/raw/thrtis_mrv_2023.xlsx` 的 `Port of Registry` + UN/LOCODE（`data/raw/unlocode/`）
+处理：港口名标准化 → 匹配坐标 → 剔除无坐标/不足 20 艘的组
+输出：`data/explore/registry_map_ready.csv`（30 组 / 3,467 艘）
+
 注册港连接、名称标准化、坐标匹配及分组汇总：
 {
   "ship_count": 4105,
@@ -139,4 +144,3 @@ Oil tanker         9   770
 绘图表仅保留同船型同注册地至少20艘且有坐标的组合：30组，覆盖3467艘。
 注册港缺失及待确认观测保留在完整船舶表和核查表，不进行模糊猜测。
 Madeira使用Funchal代表点；Bridgetown从raw中的坐标补充表读取；坐标不是排放位置。
-
